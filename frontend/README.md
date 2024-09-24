@@ -4,10 +4,12 @@ WIP
 
 # Roadmap
 
-1. Order List
+1. Order List (base)
 
 -   Status: string > "PENDING" / "COMPLETE"
--   IsProcessing: boolean
+-   isProcessing: boolean
+-   isVIP: boolean (simpler than maintaining two list, do this approach for now and see)
+-   Write a logic to insert accordingly
 
 2. Bot List
 

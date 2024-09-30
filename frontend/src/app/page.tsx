@@ -1,5 +1,4 @@
 "use client";
-
 import React, { useState, useEffect } from "react";
 
 interface Order {
@@ -17,7 +16,7 @@ interface Bot {
 
 const ORDER_PROCESSING_TIME_REQUIRED = 10; // seconds
 
-const OrderPage = () => {
+const MainOrderPage = () => {
     const [orders, setOrders] = useState<Order[]>([]);
     const [bots, setBots] = useState<Bot[]>([]);
 
@@ -322,7 +321,8 @@ const OrderPage = () => {
                                     <span>
                                         Processing Order #{bot.order.id}{" "}
                                         <span className="text-blue-600">
-                                            ({bot.progressSeconds.toFixed(1)}s)
+                                            ({bot.progressSeconds.toFixed(1)}
+                                            s)
                                         </span>
                                     </span>
                                 ) : (
@@ -337,4 +337,4 @@ const OrderPage = () => {
     );
 };
 
-export default OrderPage;
+export default MainOrderPage;

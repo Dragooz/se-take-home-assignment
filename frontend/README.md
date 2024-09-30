@@ -1,8 +1,9 @@
 # How to run
 
-1. Clone down
+1. Clone down.
 2. npm i
 3. npm run dev
+4. Enjoy!
 
 ## Roadmap
 

@@ -170,9 +170,9 @@ const OrderPage = () => {
         if (!bot.order) {
             const pendingOrder = findPendingOrder(orders);
             if (pendingOrder) {
-                console.log("pendingOrder: ", pendingOrder);
+                // console.log("pendingOrder: ", pendingOrder);
                 const updatedBot = assignOrderToBot(bot, pendingOrder);
-                console.log("updatedBot: ", updatedBot);
+                // console.log("updatedBot: ", updatedBot);
                 return {
                     bot: updatedBot,
                     orders: updateOrderStatus(orders, pendingOrder.id, true),
@@ -202,7 +202,7 @@ const OrderPage = () => {
         return () => clearInterval(interval);
     }, [orders, bots]);
 
-    console.log("bots: ", bots);
+    // console.log("bots: ", bots);
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen p-4">

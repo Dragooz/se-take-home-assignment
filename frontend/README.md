@@ -1,8 +1,8 @@
 # How to run
 
-WIP
+1. npm run dev
 
-# Roadmap
+## Roadmap
 
 1. Order List (base)
 

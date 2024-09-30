@@ -197,64 +197,133 @@ const OrderPage = () => {
     }, [orders, bots]);
 
     return (
-        <div>
-            <h1>Order Management</h1>
-            <div className="controls">
-                <button onClick={() => addOrder(false)}>
+        <div className="flex flex-col items-center justify-center h-screen p-4">
+            <h1 className="text-4xl font-bold mb-8 text-center">
+                McDonald Order Management
+            </h1>
+            <div className="mb-8 flex flex-wrap justify-center space-x-4">
+                <button
+                    onClick={() => addOrder(false)}
+                    className="bg-yellow-400 text-red-600 font-bold py-2 px-4 rounded hover:bg-yellow-500 transition duration-300 mb-2 sm:mb-0"
+                >
                     New Normal Order
                 </button>
-                <button onClick={() => addOrder(true)}>New VIP Order</button>
-                <button onClick={addBot}>+ Bot</button>
-                <button onClick={() => removeBot()}>- Bot</button>
+                <button
+                    onClick={() => addOrder(true)}
+                    className="bg-yellow-400 text-red-600 font-bold py-2 px-4 rounded hover:bg-yellow-500 transition duration-300 mb-2 sm:mb-0"
+                >
+                    New VIP Order
+                </button>
+                <button
+                    onClick={addBot}
+                    className="bg-yellow-400 text-red-600 font-bold py-2 px-4 rounded hover:bg-yellow-500 transition duration-300 mb-2 sm:mb-0"
+                >
+                    + Bot
+                </button>
+                <button
+                    onClick={() => removeBot()}
+                    className="bg-yellow-400 text-red-600 font-bold py-2 px-4 rounded hover:bg-yellow-500 transition duration-300 mb-2 sm:mb-0"
+                >
+                    - Bot
+                </button>
             </div>
-            <div className="order-lists">
-                <div className="pending-orders">
-                    <h2>Pending Orders</h2>
-                    {orders
-                        .filter((order) => order.status === "PENDING")
-                        .map((order) => (
-                            <div
-                                key={order.id}
-                                className={`order ${order.isVIP ? "vip" : ""}`}
-                            >
-                                Order #{order.id} {order.isVIP ? "(VIP)" : ""}{" "}
-                                {order.isProcessing
-                                    ? `(Processing by Bot #${
-                                          bots.find(
-                                              (bot) =>
-                                                  bot.order?.id === order.id
-                                          )?.id
-                                      })`
-                                    : ""}
-                            </div>
-                        ))}
-                </div>
-                <div className="complete-orders">
-                    <h2>Complete Orders</h2>
-                    {orders
-                        .filter((order) => order.status === "COMPLETE")
-                        .map((order) => (
-                            <div
-                                key={order.id}
-                                className={`order ${order.isVIP ? "vip" : ""}`}
-                            >
-                                Order #{order.id} {order.isVIP ? "(VIP)" : ""}
-                            </div>
-                        ))}
-                </div>
-            </div>
-            <div className="bots">
-                <h2>Bots</h2>
-                {bots.map((bot) => (
-                    <div key={bot.id} className="bot">
-                        Bot #{bot.id}:{" "}
-                        {bot.order
-                            ? `Processing Order #${
-                                  bot.order.id
-                              } (${bot.progressSeconds.toFixed(1)}s)`
-                            : "Idle"}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="bg-white rounded-lg p-4 shadow-lg">
+                    <h2 className="text-2xl font-bold mb-4 text-red-600">
+                        Pending Orders
+                    </h2>
+                    <div className="space-y-2">
+                        {orders
+                            .filter((order) => order.status === "PENDING")
+                            .map((order) => (
+                                <div
+                                    key={order.id}
+                                    className={`p-2 rounded ${
+                                        order.isVIP
+                                            ? "bg-yellow-200"
+                                            : "bg-gray-100"
+                                    } text-black`}
+                                >
+                                    <span className="font-semibold">
+                                        Order #{order.id}
+                                    </span>
+                                    {order.isVIP && (
+                                        <span className="ml-2 text-yellow-600 font-bold">
+                                            (VIP)
+                                        </span>
+                                    )}
+                                    {order.isProcessing && (
+                                        <span className="ml-2 text-blue-600">
+                                            (Processing by Bot #
+                                            {
+                                                bots.find(
+                                                    (bot) =>
+                                                        bot.order?.id ===
+                                                        order.id
+                                                )?.id
+                                            }
+                                            )
+                                        </span>
+                                    )}
+                                </div>
+                            ))}
                     </div>
-                ))}
+                </div>
+                <div className="bg-white rounded-lg p-4 shadow-lg">
+                    <h2 className="text-2xl font-bold mb-4 text-red-600">
+                        Complete Orders
+                    </h2>
+                    <div className="space-y-2">
+                        {orders
+                            .filter((order) => order.status === "COMPLETE")
+                            .map((order) => (
+                                <div
+                                    key={order.id}
+                                    className={`p-2 rounded ${
+                                        order.isVIP
+                                            ? "bg-yellow-200"
+                                            : "bg-gray-100"
+                                    } text-black`}
+                                >
+                                    <span className="font-semibold">
+                                        Order #{order.id}
+                                    </span>
+                                    {order.isVIP && (
+                                        <span className="ml-2 text-yellow-600 font-bold">
+                                            (VIP)
+                                        </span>
+                                    )}
+                                </div>
+                            ))}
+                    </div>
+                </div>
+                <div className="bg-white rounded-lg p-4 shadow-lg">
+                    <h2 className="text-2xl font-bold mb-4 text-red-600">
+                        Bots
+                    </h2>
+                    <div className="space-y-2">
+                        {bots.map((bot) => (
+                            <div
+                                key={bot.id}
+                                className="p-2 bg-gray-100 rounded text-black"
+                            >
+                                <span className="font-semibold">
+                                    Bot #{bot.id}:
+                                </span>{" "}
+                                {bot.order ? (
+                                    <span>
+                                        Processing Order #{bot.order.id}{" "}
+                                        <span className="text-blue-600">
+                                            ({bot.progressSeconds.toFixed(1)}s)
+                                        </span>
+                                    </span>
+                                ) : (
+                                    <span className="text-green-600">Idle</span>
+                                )}
+                            </div>
+                        ))}
+                    </div>
+                </div>
             </div>
         </div>
     );

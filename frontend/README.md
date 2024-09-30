@@ -1,6 +1,6 @@
 # How to run
 
-1. npm run dev
+1. Clone down & npm run dev
 
 ## Roadmap
 

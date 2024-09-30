@@ -197,8 +197,8 @@ const OrderPage = () => {
     }, [orders, bots]);
 
     return (
-        <div className="flex flex-col items-center justify-center h-screen p-4">
-            <h1 className="text-4xl font-bold mb-8 text-center">
+        <div className="flex flex-col items-center justify-center min-h-screen p-4">
+            <h1 className="text-5xl font-bold mb-8 text-center">
                 McDonald Order Management
             </h1>
             <div className="mb-8 flex flex-wrap justify-center space-x-4">
@@ -227,9 +227,9 @@ const OrderPage = () => {
                     - Bot
                 </button>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="bg-white rounded-lg p-4 shadow-lg">
-                    <h2 className="text-2xl font-bold mb-4 text-red-600">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 w-full max-w-6xl">
+                <div className="bg-white rounded-lg p-4 shadow-lg h-[500px] overflow-y-auto">
+                    <h2 className="text-2xl font-bold mb-4 text-red-600 sticky top-0 bg-white">
                         Pending Orders
                     </h2>
                     <div className="space-y-2">
@@ -269,8 +269,8 @@ const OrderPage = () => {
                             ))}
                     </div>
                 </div>
-                <div className="bg-white rounded-lg p-4 shadow-lg">
-                    <h2 className="text-2xl font-bold mb-4 text-red-600">
+                <div className="bg-white rounded-lg p-4 shadow-lg h-[500px] overflow-y-auto">
+                    <h2 className="text-2xl font-bold mb-4 text-red-600 sticky top-0 bg-white">
                         Complete Orders
                     </h2>
                     <div className="space-y-2">
@@ -297,8 +297,8 @@ const OrderPage = () => {
                             ))}
                     </div>
                 </div>
-                <div className="bg-white rounded-lg p-4 shadow-lg">
-                    <h2 className="text-2xl font-bold mb-4 text-red-600">
+                <div className="bg-white rounded-lg p-4 shadow-lg h-[500px] overflow-y-auto">
+                    <h2 className="text-2xl font-bold mb-4 text-red-600 sticky top-0 bg-white">
                         Bots
                     </h2>
                     <div className="space-y-2">

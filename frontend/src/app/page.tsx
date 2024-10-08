@@ -3,6 +3,7 @@ import React, { useState, useEffect } from "react";
 
 interface Order {
     id: string;
+    weight: number;
     status: "PENDING" | "COMPLETE";
     isProcessing: boolean;
     isVIP: boolean;
@@ -10,8 +11,10 @@ interface Order {
 
 interface Bot {
     id: string;
+    weight: number;
     order: Order | null;
     progressSeconds: number;
+    isVIP: boolean;
 }
 
 const ORDER_PROCESSING_TIME_REQUIRED = 10; // seconds
@@ -25,6 +28,7 @@ const MainOrderPage = () => {
         // Define a new order here
         const newOrder: Order = {
             id: (orders.length + 1).toString(), // Generate a unique and sequential ID
+            weight: orders.length + 1,
             status: "PENDING",
             isProcessing: false,
             isVIP: isVIP,
@@ -55,14 +59,16 @@ const MainOrderPage = () => {
     };
 
     // Function to add a new bot
-    const addBot = () => {
+    const addBot = (isVIP: boolean) => {
         const pendingOrder = orders.find(
             (order) => order.status === "PENDING" && !order.isProcessing
         );
         const newBot: Bot = {
             id: `bot-${bots.length + 1}`,
+            weight: bots.length + 1,
             order: pendingOrder || null,
             progressSeconds: 0,
+            isVIP: isVIP,
         };
 
         setBots((prevBots) => [...prevBots, newBot]);
@@ -107,12 +113,6 @@ const MainOrderPage = () => {
     };
 
     // Use Effect
-    const findPendingOrder = (orders: Order[]): Order | undefined => {
-        return orders.find(
-            (order) => order.status === "PENDING" && !order.isProcessing
-        );
-    };
-
     const assignOrderToBot = (bot: Bot, pendingOrder: Order): Bot => {
         return {
             ...bot,
@@ -121,7 +121,7 @@ const MainOrderPage = () => {
         };
     };
 
-    const updateOrderStatus = (
+    const assignBotToOrderstatus = (
         orders: Order[],
         orderId: string,
         isProcessing: boolean
@@ -133,69 +133,107 @@ const MainOrderPage = () => {
         );
     };
 
-    const processOrder = (
-        bot: Bot,
+    const updateBotProgress = (
+        bots: Bot[],
         orders: Order[]
-    ): { bot: Bot; orders: Order[] } => {
-        const updatedProgressSeconds = bot.progressSeconds + 0.1;
+    ): { bots: Bot[]; orders: Order[] } => {
+        // console.log("bot: ", bot);
+        // console.log("orders: ", orders);
 
-        if (updatedProgressSeconds >= ORDER_PROCESSING_TIME_REQUIRED) {
-            const updatedOrders = updateOrderStatus(
-                orders,
-                bot.order?.id || "",
-                false
-            ).map((order) =>
-                order.id === bot.order?.id
-                    ? { ...order, status: "COMPLETE" }
-                    : order
-            );
+        let updatedOrders = [...orders];
+        let updatedBots = [...bots];
 
-            return {
-                bot: { ...bot, order: null, progressSeconds: 0 },
-                orders: updatedOrders as Order[],
-            };
-        }
+        bots.map((bot) => {
+            const updatedProgressSeconds = bot.progressSeconds + 0.1;
+            const isBotVIP = bot.isVIP;
+            const orderProcessingTimeRequired = isBotVIP
+                ? ORDER_PROCESSING_TIME_REQUIRED / 2
+                : ORDER_PROCESSING_TIME_REQUIRED;
 
-        return {
-            bot: { ...bot, progressSeconds: updatedProgressSeconds },
-            orders,
-        };
+            if (updatedProgressSeconds >= orderProcessingTimeRequired) {
+                updatedOrders = assignBotToOrderstatus(
+                    orders,
+                    bot.order?.id || "",
+                    false
+                ).map((order) =>
+                    order.id === bot.order?.id
+                        ? { ...order, status: "COMPLETE" }
+                        : order
+                );
+                updatedBots = updatedBots.map((b) => {
+                    if (b.id === bot.id) {
+                        return { ...b, order: null, progressSeconds: 0 };
+                    }
+                    return b;
+                });
+            }
+            updatedBots = updatedBots.map((b) => {
+                if (b.id === bot.id) {
+                    return { ...b, progressSeconds: updatedProgressSeconds };
+                }
+                return b;
+            });
+        });
+
+        return { bots: updatedBots, orders: updatedOrders };
     };
 
-    const updateBot = (
-        bot: Bot,
-        orders: Order[]
-    ): { bot: Bot; orders: Order[] } => {
-        if (!bot.order) {
-            const pendingOrder = findPendingOrder(orders);
-            if (pendingOrder) {
-                // console.log("pendingOrder: ", pendingOrder);
-                const updatedBot = assignOrderToBot(bot, pendingOrder);
-                // console.log("updatedBot: ", updatedBot);
-                return {
-                    bot: updatedBot,
-                    orders: updateOrderStatus(orders, pendingOrder.id, true),
-                };
-            }
-        } else {
-            return processOrder(bot, orders);
-        }
-        return { bot, orders };
+    const assignBotToOrders = (
+        orders: Order[],
+        bots: Bot[]
+    ): { orders: Order[]; bots: Bot[] } => {
+        // 1. Loop through the orders that is not processing
+        // 2. If VIP order, try to find the first VIP bot to process; else find normal bot to process
+        // 3. If normal order, find the first normal bot to process; else find VIP bot to process
+        // 4. Update the order and bot status
+        // 5. Return the updated orders and bots
+        let updatedOrders = [...orders];
+        let updatedBots = [...bots];
+
+        orders
+            .filter(
+                (order) => order.status === "PENDING" && !order.isProcessing
+            )
+            .forEach((order) => {
+                const bot = bots.find(
+                    (bot) => bot.isVIP === order.isVIP && !bot.order
+                );
+                if (bot) {
+                    const updatedBot = assignOrderToBot(bot, order);
+                    updatedBots = updatedBots.map((b) =>
+                        b.id === bot.id ? updatedBot : b
+                    );
+                    updatedOrders = updatedOrders.map((o) =>
+                        o.id === order.id ? { ...o, isProcessing: true } : o
+                    );
+                } else {
+                    const anyBot = bots.find((bot) => !bot.order);
+                    if (anyBot) {
+                        const updatedBot = assignOrderToBot(anyBot, order);
+                        updatedBots = updatedBots.map((b) =>
+                            b.id === anyBot.id ? updatedBot : b
+                        );
+                        updatedOrders = updatedOrders.map((o) =>
+                            o.id === order.id ? { ...o, isProcessing: true } : o
+                        );
+                    }
+                }
+            });
+
+        return { orders: updatedOrders, bots: updatedBots };
     };
 
     useEffect(() => {
         const interval = setInterval(() => {
-            let updatedOrders = [...orders];
-            let updatedBots = [...bots];
+            const { bots: updatedBots, orders: updatedOrders } =
+                updateBotProgress([...bots], [...orders]);
+            const { orders: finalOrders, bots: finalBots } = assignBotToOrders(
+                updatedOrders,
+                updatedBots
+            );
 
-            updatedBots = updatedBots.map((bot) => {
-                const result = updateBot(bot, updatedOrders);
-                updatedOrders = result.orders;
-                return result.bot;
-            });
-
-            setOrders(updatedOrders);
-            setBots(updatedBots);
+            setOrders(finalOrders);
+            setBots(finalBots);
         }, 100);
 
         return () => clearInterval(interval);
@@ -222,10 +260,16 @@ const MainOrderPage = () => {
                     New VIP Order
                 </button>
                 <button
-                    onClick={addBot}
+                    onClick={() => addBot(false)}
                     className="bg-yellow-400 text-red-600 font-bold py-2 px-4 rounded hover:bg-yellow-500 transition duration-300 mb-2 sm:mb-0"
                 >
                     + Bot
+                </button>
+                <button
+                    onClick={() => addBot(true)}
+                    className="bg-yellow-400 text-red-600 font-bold py-2 px-4 rounded hover:bg-yellow-500 transition duration-300 mb-2 sm:mb-0"
+                >
+                    + Bot (VIP)
                 </button>
                 <button
                     onClick={() => removeBot()}
@@ -315,6 +359,11 @@ const MainOrderPage = () => {
                                 className="p-2 bg-gray-100 rounded text-black"
                             >
                                 <span className="font-semibold">
+                                    {bot.isVIP && (
+                                        <span className="ml-2 text-yellow-600 font-bold">
+                                            (VIP)
+                                        </span>
+                                    )}{" "}
                                     Bot #{bot.id}:
                                 </span>{" "}
                                 {bot.order ? (

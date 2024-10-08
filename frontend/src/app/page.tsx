@@ -1,6 +1,5 @@
 "use client";
 import React, { useState, useEffect } from "react";
-import internal from "stream";
 
 interface Order {
     id: string;
@@ -114,21 +113,6 @@ const MainOrderPage = () => {
     };
 
     // Use Effect
-    const findPendingOrder = (orders: Order[]): Order | undefined => {
-        // console.log("orders in  finding pending order: ", orders);
-        return orders.find(
-            (order) => order.status === "PENDING" && !order.isProcessing
-        );
-    };
-
-    const findVIPPendingOrder = (orders: Order[]): Order | undefined => {
-        // console.log("orders in  finding pending order: ", orders);
-        return orders.find(
-            (order) =>
-                order.status === "PENDING" && !order.isProcessing && order.isVIP
-        );
-    };
-
     const assignOrderToBot = (bot: Bot, pendingOrder: Order): Bot => {
         return {
             ...bot,
